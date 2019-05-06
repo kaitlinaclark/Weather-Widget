@@ -1,0 +1,63 @@
+<!doctype html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+			<!--BOOTSTRAP CSS-->
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+            <!--Required stylesheet-->
+            <link rel="stylesheet" type="text/css" href="http://classes.engineering.wustl.edu/cse330/content/weather.css">
+            <title>Weather Widget</title>
+		</head>
+		<body>
+            <div class="weather" id="weatherWidget">
+                <div class="weather-loc"></div>
+                <div class="weather-humidity"></div>
+                <div class="weather-temp"></div>
+                <img class="weather-tomorrow" />
+                <img class="weather-dayaftertomorrow" />
+            </div> 
+            <!--Button that calls fetchWeather() when clicked-->
+            <button type="button" class="btn btn-primary" id="req_button">Click ME</button>
+            <script>
+                //fetch current weather once DOM is loaded
+                document.addEventListener("DOMContentLoaded", fetchWeather, false);
+                
+                document.getElementById("req_button").addEventListener("click", fetchWeather, false);
+
+                //fetchWeather from weather_json.php
+                function fetchWeather(){
+                    //AJAX request to weather_json.php
+                    var xmlHttp = new XMLHttpRequest();
+	                xmlHttp.open("POST", "https://classes.engineering.wustl.edu/cse330/content/weather_json.php", true);
+                    //xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	                xmlHttp.addEventListener("load", function(event){
+                        var jsonData = JSON.parse(event.target.responseText);
+
+                        //Location
+                        let loc = document.getElementsByClassName("weather-loc")[0];
+                        loc.innerHTML = "";
+                            //city in strong tag
+                        let city = document.createElement("strong");
+                        loc.appendChild(city);
+                        city.textContent = jsonData.location.city;
+                            //state not in tag
+                        loc.innerHTML += (" "+jsonData.location.state);
+                        
+                        //Humidity
+                        document.getElementsByClassName("weather-humidity")[0].textContent = jsonData.atmosphere.humidity;
+                        
+                        //Current temp
+                        document.getElementsByClassName("weather-temp")[0].textContent = jsonData.current.temp;
+
+                        //images
+                            //image for tomorrow
+                        document.getElementsByClassName("weather-tomorrow")[0].setAttribute("src", `http://us.yimg.com/i/us/nws/weather/gr/${jsonData.tomorrow.code}ds.png`);
+                            //image for day after
+                        document.getElementsByClassName("weather-dayaftertomorrow")[0].setAttribute("src", `http://us.yimg.com/i/us/nws/weather/gr/${jsonData.dayafter.code}ds.png`);
+                    }, false);
+	                xmlHttp.send(null);
+                }
+            </script>
+		</body>
+    </html>
